@@ -1,0 +1,82 @@
+package com.example.computerstore.Service.Impl;
+import com.example.computerstore.Exception.CertifiedUserException;
+import com.example.computerstore.Exception.ProductMatchException;
+import com.example.computerstore.Model.*;
+import com.example.computerstore.Service.ClientService;
+import com.example.computerstore.Service.Helper;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.example.computerstore.Service.Impl.AdminServiceImpl.categoryList;
+import static com.example.computerstore.Service.Impl.AdminServiceImpl.productList;
+@Service
+public class ClientServiceImpl implements ClientService {
+    public static List<Customer> customerList = new ArrayList<>();
+    public static List<Order> orderList=new ArrayList<>();
+    public static List<OrderHistory>orderHistoryList=new ArrayList<>();
+
+    public ClientServiceImpl() {
+        initializeList();
+    }
+
+    private void initializeList() {
+        customerList.add(Customer.of("seo", "sdh", "seo12@naver.com", "12345", "경기도 성남시 분당구 판교로"));
+    }
+
+    @Override
+    public List<Category> getCategory() {
+        return categoryList;
+    }
+
+    @Override
+    public List<Product> getProductDetail(int categoryId) {
+        List<Product> matchedProducts = new ArrayList<>();
+        for (Product product : productList) {
+            if (product.getCategoryId().getId() == categoryId) {
+                matchedProducts.add(product);
+            }
+        }
+        return matchedProducts;
+    }
+
+    @Override
+    public void createUser(Customer customer) {
+        customerList.add(customer);
+    }
+    @Override
+    public OrderHistory createOrder(String userId, String userPw, int productId, int quantity)
+            throws CertifiedUserException, ProductMatchException {
+
+        Customer customer = Helper.matchCertifiedUser(userId, userPw);
+        if (customer == null) {
+            throw CertifiedUserException.forUserId(userId);
+        }
+
+        Product product = Helper.isFindProductById(productId);
+        if (product == null) {
+            throw ProductMatchException.forId(productId);
+        }
+
+        if (quantity > product.getStockQuantity()) {
+            throw ProductMatchException.stockShortage(productId, quantity, product.getStockQuantity());
+        }
+
+        Order newOrder = Order.of(product, quantity, customer, Status.PENDING);
+        orderList.add(newOrder);
+
+        int newStockQuantity = product.getStockQuantity() - quantity;
+        product.setStockQuantity(newStockQuantity);
+
+        OrderHistory newOrderHistory = OrderHistory.of(customer.getId(), customer.getName(),
+                customer.getShippingAddress(), product.getName(),
+                product.getPrice(), quantity, newOrder.getTotalAmount());
+        orderHistoryList.add(newOrderHistory);
+
+        return newOrderHistory;
+    }
+
+
+}
+
