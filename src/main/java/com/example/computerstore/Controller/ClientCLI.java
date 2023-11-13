@@ -1,10 +1,6 @@
 package com.example.computerstore.Controller;
-
-
 import com.example.computerstore.Model.Customer;
-
 import java.util.Scanner;
-
 import static com.example.computerstore.Service.Impl.AdminServiceImpl.categoryList;
 
 public class ClientCLI {
