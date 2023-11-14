@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
-@Setter
 public class Order {
     private UUID id;
     private Product orderedProduct;

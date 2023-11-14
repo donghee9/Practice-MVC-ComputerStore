@@ -1,11 +1,20 @@
-package com.example.computerstore.Controller;
+package com.example.computerstore.Presentation;
+import com.example.computerstore.Controller.ClientController;
+import com.example.computerstore.Model.Category;
 import com.example.computerstore.Model.Customer;
+import com.example.computerstore.Model.Product;
+import com.example.computerstore.Service.DataStore;
+import com.example.computerstore.Service.Impl.DataStoreImpl;
+
+import java.util.List;
 import java.util.Scanner;
-import static com.example.computerstore.Service.Impl.AdminServiceImpl.categoryList;
+
 
 public class ClientCLI {
     private ClientController clientController;
     private Scanner scanner;
+
+    List<Category> categoryList = DataStore.getCategoryList();
 
     public ClientCLI() {
         this.clientController = new ClientController();
@@ -43,20 +52,42 @@ public class ClientCLI {
 
 
     private void viewCategories() {
-        String response = clientController.showCategories();
-        System.out.println(response);
+        List<Category> categories = clientController.showCategories();
+        if (categories.isEmpty()) {
+            System.out.println("카테고리가 존재하지 않습니다.");
+        } else {
+            System.out.println("카테고리 목록:");
+            for (Category category : categories) {
+                System.out.println("- id=" + category.getId() + ", " + category.getCategoryName());
+            }
+        }
 
         System.out.print("상품 상세정보를 보고 싶은 카테고리 번호를 입력하세요 (취소하려면 0을 입력): ");
         int categoryId = scanner.nextInt();
 
-
-        if (categoryId > 0 && categoryId <= categoryList.size()) {
-            String productDetails = clientController.showProductDetail(categoryId);
-            System.out.println(productDetails);
+        if (categoryId > 0 && categoryId <= categories.size()) {
+            List<Product> products = clientController.showProductDetail(categoryId);
+            if (products.isEmpty()) {
+                System.out.println("이 카테고리에는 상품이 없습니다.");
+            } else {
+                System.out.println("\n상품 목록:");
+                System.out.println("---------------------------------------------------------");
+                System.out.printf("%-3s %-10s %-15s %-10s %-10s\n", "ID", "제품명", "설명", "가격", "재고수량");
+                System.out.println("---------------------------------------------------------");
+                for (Product product : products) {
+                    System.out.printf("%-3d %-10s %-15s %-10.2f %-10d\n",
+                            product.getId(), product.getName(), product.getDescription(),
+                            product.getPrice(), product.getStockQuantity());
+                }
+                System.out.println("---------------------------------------------------------");
+            }
         } else if (categoryId != 0) {
             System.out.println("잘못된 카테고리 번호입니다.");
         }
     }
+
+
+
     private void createUser() {
         scanner.nextLine();
         System.out.print("이름: ");

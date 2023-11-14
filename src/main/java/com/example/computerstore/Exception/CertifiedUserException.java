@@ -2,12 +2,11 @@ package com.example.computerstore.Exception;
 
 public class CertifiedUserException extends Exception {
 
-
-    public CertifiedUserException(String message) {
-        super(message);
+    public CertifiedUserException(ErrorCode errorCode) {
+        super(errorCode.getDescription());
     }
 
     public static CertifiedUserException forUserId(String userId) {
-        return new CertifiedUserException("사용자 " + userId + "에 대한 인증에 실패했습니다.");
+        return new CertifiedUserException(ErrorCode.USER_NOT_FOUND);
     }
 }

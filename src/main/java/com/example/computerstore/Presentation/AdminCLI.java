@@ -1,9 +1,12 @@
-package com.example.computerstore.Controller;
-
+package com.example.computerstore.Presentation;
+import com.example.computerstore.Controller.AdminController;
 import com.example.computerstore.Model.Category;
 import com.example.computerstore.Model.Product;
+import com.example.computerstore.Service.DataStore;
 import com.example.computerstore.Service.Helper;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class AdminCLI {
@@ -16,6 +19,7 @@ public class AdminCLI {
     }
 
     public void run() {
+        showProductListByCategory();
         while (true) {
             System.out.println("\n1. 제품 등록");
             System.out.println("2. 제품 가격 수정");
@@ -45,7 +49,34 @@ public class AdminCLI {
         }
     }
 
-    private void registerProduct() {
+    private void showProductListByCategory() {
+        List<Category> categories = adminController.showCategories();
+        if (categories.isEmpty()) {
+            System.out.println("카테고리가 존재하지 않습니다.");
+            return;
+        }
+
+        for (Category category : categories) {
+            System.out.println("-" + category.getId() + " " + category.getCategoryName());
+            List<Product> products = adminController.showProductDetail(category.getId());
+            if (products.isEmpty()) {
+                System.out.println("   이 카테고리에는 상품이 없습니다.");
+                continue;
+            }
+
+            System.out.println("--------------------------------------------------------------");
+            System.out.printf("%-3s %-10s %-15s %-10s %-10s\n", "ID", "제품명", "설명", "가격", "재고수량");
+            System.out.println("---------------------------------------------------------");
+            for (Product product : products) {
+                System.out.printf("%-3d %-10s %-15s %-10.2f %-10d\n",
+                        product.getId(), product.getName(), product.getDescription(),
+                        product.getPrice(), product.getStockQuantity());
+            }
+            System.out.println("--------------------------------------------------------------");
+        }
+    }
+
+        private void registerProduct() {
         System.out.print("관리자 ID: ");
         String adminId = scanner.nextLine();
 
@@ -57,11 +88,12 @@ public class AdminCLI {
         scanner.nextLine(); // 버퍼 비우기
 
 
-        Category category = Helper.isFindCategoryById(categoryId);
-        if (category == null) {
+        Optional<Category> optionalCategory = Helper.isFindCategoryById(categoryId);
+        if (!optionalCategory.isPresent()) {
             System.out.println("해당 ID를 가진 카테고리가 존재하지 않습니다.");
             return;
         }
+        Category category = optionalCategory.get();
 
         System.out.print("제품 이름: ");
         String name = scanner.nextLine();

@@ -1,17 +1,12 @@
 package com.example.computerstore;
 
-import com.example.computerstore.Controller.AdminCLI;
-import com.example.computerstore.Controller.ClientCLI;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import com.example.computerstore.Presentation.AdminCLI;
+import com.example.computerstore.Presentation.ClientCLI;
 import java.util.Scanner;
 
-@SpringBootApplication
 public class ComputerStoreApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ComputerStoreApplication.class, args);
         runCLI();
     }
 

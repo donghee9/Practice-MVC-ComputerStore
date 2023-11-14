@@ -4,21 +4,26 @@ import com.example.computerstore.Model.Admin;
 import com.example.computerstore.Model.Category;
 import com.example.computerstore.Model.Customer;
 import com.example.computerstore.Model.Product;
-import com.example.computerstore.Service.Impl.AdminServiceImpl;
+
+
+import java.util.List;
+import java.util.Optional;
+
 
 import static com.example.computerstore.Service.Impl.AdminServiceImpl.adminList;
-import static com.example.computerstore.Service.Impl.AdminServiceImpl.productList;
+
 import static com.example.computerstore.Service.Impl.ClientServiceImpl.customerList;
 
+
+
 public class Helper {
+    static List<Category> categoryList = DataStore.getCategoryList();
+    static List<Product> productList = DataStore.getProductList();
 
     public static boolean matchAdmin(String inputId, String inputPw) {
         boolean matched = idAndPwCheck(inputId, inputPw);
         return matched;
     }
-
-
-
     public static boolean idAndPwCheck(String inputId, String inputPw) {
         for (Admin admin : adminList) {
             if (admin.getId().equals(inputId) && admin.getPw().equals(inputPw)) {
@@ -27,48 +32,48 @@ public class Helper {
         }
         return false;
     }
-
-    public static Customer matchCertifiedUser(String userId, String userPw) {
-        Customer matchedCustomer = findCustomerByCredentials(userId, userPw);
-        return matchedCustomer;
+    public static Optional<Customer> matchCertifiedUser(String userId, String userPw) {
+        return findCustomerByCredentials(userId, userPw);
     }
 
-    private static Customer findCustomerByCredentials(String userId, String userPw) {
+    private static Optional<Customer> findCustomerByCredentials(String userId, String userPw) {
         for (Customer customer : customerList) {
             if (customer.getUserId().equals(userId) && customer.getPw().equals(userPw)) {
-                return customer;
+                return Optional.of(customer);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-
-    public static Product isFindProductByName(String productName) {
+    public static Optional<Product> isFindProductByName(String productName) {
         for (Product product : productList) {
             if (product.getName().equals(productName)) {
-                return product;
+                return Optional.of(product);
             }
         }
-        return null;
+        return Optional.empty();
     }
-    public static Product isFindProductById(int productId) {
+
+    public static Optional<Product> isFindProductById(int productId) {
         for (Product product : productList) {
             if (product.getId() == productId) {
-                return product;
+                return Optional.of(product);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public static Category isFindCategoryById(int categoryId) {
-        for (Category category : AdminServiceImpl.categoryList) {
+    public static Optional<Category> isFindCategoryById(int categoryId) {
+        for (Category category : categoryList) {
             if (category.getId() == categoryId) {
-                return category;
+                return Optional.of(category);
             }
         }
-        return null;
+        return Optional.empty();
     }
+
 
 }
+
 
 
